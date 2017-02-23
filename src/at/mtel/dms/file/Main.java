@@ -8,7 +8,7 @@ import java.text.ParseException;
 
 public class Main {
 	public static final String PROPS_LOCATION = "/opt/properties/properties.xml";
-	//public static final String PROPS_LOCATION = "properties.xml";
+	//public static final String PROPS_LOCATION = "D:\\support\\DMS\\properties.xml";
 	
 	public static void main(String[] args) throws ParseException {
 

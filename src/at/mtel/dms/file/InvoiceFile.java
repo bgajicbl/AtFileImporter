@@ -9,18 +9,12 @@ import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Properties;
-
 import org.apache.http.client.methods.CloseableHttpResponse;
 import at.mtel.denza.alfresco.servlet.AlfrescoCreateFolder;
 import at.mtel.denza.alfresco.servlet.AlfrescoUploadFile;
