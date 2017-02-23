@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+	
+	<entry key="fileExtension">.pdf</entry>
+	
+	<entry key="fileDelimiter">#</entry>
+	
+	<entry key="inputFolder">D:\support\DMS\invoices</entry>
+	
+	<entry key="doneFolder">D:\support\DMS\invoices\done</entry>
+		
+	<entry key="logFolder">D:\support\DMS\invoices\log</entry>
+	
+	<entry key="errorFolder">D:\support\DMS\invoices\error</entry>
+		
+	<entry key="logFileExtension">.txt</entry>
+	
+	<entry key="modifiedInDays">1</entry>
+	
+	<entry key="testNodeRef">cecac9f3-f2d6-4455-9f3f-a77dc4484720</entry>
+	
+	<entry key="mtelAustrijaNodeRef">ad581821-2560-4276-a121-b1c0acd28642</entry>
+	
+	<entry key="webServiceUrl">http://127.0.0.1:9080/RestWebService/</entry>
+		
+	<entry key="alfrescoIPAddress">http://127.0.0.1:8080/</entry>
+		
+	<entry key="alfrescoPass">admin45</entry>
+	
+	
+	
+	
+	
+	
+</properties>
