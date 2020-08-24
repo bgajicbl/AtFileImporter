@@ -50,7 +50,6 @@ public class AlfrescoCreateFolder extends AlfrescoWebScript {
 					StringBuffer sb = new StringBuffer();
 					while ((line = br.readLine()) != null) {
 						sb.append(line);
-						//System.out.println(line);
 					}
 					// kao odgovor vraca noderef ako je sve proslo kako treba u suprotnom vraca null
 					JSONObject jobject = new JSONObject(sb.toString());

@@ -8,10 +8,10 @@ import java.text.ParseException;
 
 public class Main {
 	public static final String PROPS_LOCATION = "/opt/properties/properties.xml";
-	//public static final String PROPS_LOCATION = "D:\\support\\DMS\\properties.xml";
+	//public static final String PROPS_LOCATION = "D:\\Posao\\code\\mAt\\code\\properties.xml";
 	
 	public static void main(String[] args) throws ParseException {
-
+		
 		if (args.length == 0 || args[0] == null) {
 			System.out.println("Nije unesena operacija!");
 			System.exit(-1);
@@ -44,11 +44,5 @@ public class Main {
 		} catch (IOException e) {
 			e.getMessage();
 		}
-
-		/*
-		 * String sss = "83560-2667003-151101-7_een.PDF"; sss =
-		 * sss.substring(sss.indexOf("_")+1); sss =
-		 * sss.substring(0,sss.indexOf(".")); System.out.println(sss);
-		 */
 	}
 }

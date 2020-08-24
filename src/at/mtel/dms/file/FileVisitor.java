@@ -22,7 +22,6 @@ public class FileVisitor extends SimpleFileVisitor<Path> {
 			String parentName = file.getParent().getFileName().toString();
 			if (file.getFileName().toString().toLowerCase().endsWith(exstension))
 				paths.add(file);
-			
 		}
 		return CONTINUE;
 	}

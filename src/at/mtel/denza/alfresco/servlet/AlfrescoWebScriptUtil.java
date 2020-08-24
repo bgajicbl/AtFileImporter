@@ -8,14 +8,15 @@ import java.net.URL;
 import at.mtel.dms.file.UtilClass;
 
 public class AlfrescoWebScriptUtil {
-	
+
 	public static String getTicket() throws IOException {
-		
+
 		String pass = UtilClass.getProperties().getProperty("alfrescoPass");
 		int len = pass.length();
-		pass = pass.substring(0, len-2);
-		
-		URL url = new URL(AlfrescoWebScriptUtil.getAlfrescoIPAddress()+"alfresco/service/api/login?u=admin&pw="+pass);
+		pass = pass.substring(0, len - 2);
+
+		URL url = new URL(
+				AlfrescoWebScriptUtil.getAlfrescoIPAddress() + "alfresco/service/api/login?u=admin&pw=" + pass);
 		BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
 		StringBuffer sb = new StringBuffer();
 		String inputLine;
@@ -24,15 +25,13 @@ public class AlfrescoWebScriptUtil {
 		in.close();
 		return sb.substring(sb.indexOf("<ticket>") + 8, sb.indexOf("</ticket>"));
 	}
-	
+
 	public static String getAlfrescoIPAddress() {
 		return alfrescoIPAddress;
 	}
 
 	private static String alfrescoIPAddress = UtilClass.getProperties().getProperty("alfrescoIPAddress");
-	//private static String alfrescoIPAddress = "http://10.0.123.4:8080/";
-	
+
 	private static String mtelAustrijaNodeRef = UtilClass.getProperties().getProperty("mtelAustrijaNodeRef");
-	//private static String mtelAustrijaNodeRef = "cecac9f3-f2d6-4455-9f3f-a77dc4484720";
 
 }

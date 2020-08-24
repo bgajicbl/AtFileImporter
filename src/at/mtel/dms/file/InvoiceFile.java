@@ -15,6 +15,11 @@ import java.util.Calendar;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.http.client.methods.CloseableHttpResponse;
 import at.mtel.denza.alfresco.servlet.AlfrescoCreateFolder;
 import at.mtel.denza.alfresco.servlet.AlfrescoUploadFile;
@@ -35,10 +40,12 @@ public class InvoiceFile implements Writable {
 			System.out.println("Greska prilikom pravljenja liste fajlova!");
 			e.printStackTrace();
 		}
-		// procitaj linije iz svih fajlova, ako dodje do greske fajl prebaci u
-		// error folder
+		// procitaj linije iz svih fajlova, ako dodje do greske fajl prebaci u error
+		// folder
 		List<Path> paths = fv.getPaths();
-
+		if (paths.size() == 0) {
+			Logger.writeToLogFile(getDateAndTime() + ": Input folder is empty!");
+		}
 		for (Path p1 : paths) {
 			String[] custData = p1.getFileName().toString().split("-");
 			customer = custData[0];
@@ -50,7 +57,7 @@ public class InvoiceFile implements Writable {
 				prebaciFajl(p1, "errorFolder");
 				continue;
 			}
-			
+
 			if (custData.length == 5) {// subscriber
 				subscriber = custData[1];
 				period = "20" + custData[3];
@@ -63,12 +70,7 @@ public class InvoiceFile implements Writable {
 
 			documentType = documentType.substring(documentType.indexOf("_") + 1);
 			documentType = documentType.substring(0, documentType.indexOf("."));
-			// System.out.println("***" + documentType + "***");
 			// podesiti id tipa dokumenta
-			/*
-			 * 
-			 * TODO: prebaciti u zasebnu klasu
-			 */
 			switch (documentType) {
 			case "een":
 				documentTypeId = "20";// listing
@@ -78,14 +80,32 @@ public class InvoiceFile implements Writable {
 			}
 			// pravljenje foldera u Alfresco-u
 			odg = null;
+			long alfrescoTimeout = 10000L;
 			try {
-				new AlfrescoCreateFolder().sendPost(customer, customer, "Folder za klijenta " + customer, "cm:folder",
-						UtilClass.getProperties().getProperty("mtelAustrijaNodeRef"));
+				alfrescoTimeout = Long.decode(UtilClass.getProperties().getProperty("alfrescoTimeout")).longValue();
+			} catch (NumberFormatException nfe) {
+				Logger.writeToLogFile("alfrescoTimeout parameter value is not a number");
+			}
+			try {
+				// ako Alfresco operacije traju duže od definisanog, preskociti fajl
+				ExecutorService executorService = Executors.newSingleThreadExecutor();
+				executorService.execute(() -> {
+					try {
+						// kreiranje foldera
+						createAlfrescoFolder(customer);
+						// upload fajla, kao odgovor se vraca nodeRef
+						odg = new AlfrescoUploadFile().parseResponse(createAlfrescoFile(customer, p1));
+						executorService.shutdown();
+					} catch (IOException e) {
+						Logger.writeToLogFile("Alfresco upload exception. Customer: " + customer);
 
-				// upload fajla kao odgovor se vraca nodeRef
-				chc = new AlfrescoUploadFile().sendPost(customer,
-						UtilClass.getProperties().getProperty("mtelAustrijaNodeRef"), "Fajl", p1.toString());
-				odg = new AlfrescoUploadFile().parseResponse(chc);
+					}
+				});
+				if (!executorService.awaitTermination(alfrescoTimeout, TimeUnit.MILLISECONDS)) {
+					Logger.writeToLogFile("Alfresco response timeout. Customer: " + customer);
+					// TODO: Send email
+					continue;
+				}
 
 				if (odg.startsWith("work")) {
 					odg = odg.substring(odg.lastIndexOf('/') + 1);
@@ -99,7 +119,6 @@ public class InvoiceFile implements Writable {
 				params.put("documentType", documentTypeId);
 
 				boolean wsWrite = new WebServiceCall().metadataInsert(params);
-				// System.out.println("wsWrite: " + wsWrite);
 				// ako je WsWrite OK, prebaciti fajl u done folder. Ako nije,
 				// obrisati iz Alfreso-a i prebaciti u error.
 				if (wsWrite) {
@@ -109,22 +128,30 @@ public class InvoiceFile implements Writable {
 				} else {
 					prebaciFajl(p1, "errorFolder");
 					/*
-					 * obrisati iz Alfresco-a
-					 * 
+					 * TODO: obrisati iz Alfresco-a
 					 */
 					Logger.writeToLogFile(getDateAndTime() + " Greska prilikom poZiva ws: " + p1.getFileName()
 							+ ". Fajl je prebacen u error folder.");
 				}
 
-			} catch (IOException ioe) {
+			} catch (IOException | InterruptedException ioe) {
 				Logger.writeToLogFile(getDateAndTime() + " Greska prilikom upisivanja u Alfresco fajla: "
 						+ p1.getFileName() + ". Fajl je prebacen u error folder.");
 				prebaciFajl(p1, "errorFolder");
 				System.out.println(ioe.getMessage());
 			}
-			System.out.println(odg);
-
+			//System.out.println(odg);
 		}
+	}
+
+	private void createAlfrescoFolder(String customer) throws IOException {
+		new AlfrescoCreateFolder().sendPost(customer, customer, "Folder za klijenta " + customer, "cm:folder",
+				UtilClass.getProperties().getProperty("mtelAustrijaNodeRef"));
+	}
+
+	private CloseableHttpResponse createAlfrescoFile(String customer, Path p) throws IOException {
+		return new AlfrescoUploadFile().sendPost(customer, UtilClass.getProperties().getProperty("mtelAustrijaNodeRef"),
+				"Fajl", p.toString());
 	}
 
 	public void prebaciFajl(Path pe, String folder) throws IOException {
@@ -139,6 +166,5 @@ public class InvoiceFile implements Writable {
 
 	private List<String> lines = new ArrayList<String>();
 	private String customer, subscriber, documentId, documentType, documentTypeId, period, odg;
-	private CloseableHttpResponse chc;
 
 }

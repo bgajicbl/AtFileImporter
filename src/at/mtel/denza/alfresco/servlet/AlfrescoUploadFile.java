@@ -54,7 +54,6 @@ public class AlfrescoUploadFile extends AlfrescoWebScript {
 					StringBuffer sb = new StringBuffer();
 					while ((line = br.readLine()) != null) {
 						sb.append(line);
-						//System.out.println(line);
 					}
 					JSONObject jobject = new JSONObject(sb.toString());
 					JSONObject status = jobject.getJSONObject("status");
