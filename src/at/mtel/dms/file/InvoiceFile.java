@@ -50,7 +50,7 @@ public class InvoiceFile implements Writable {
 			String[] custData = p1.getFileName().toString().split("-");
 			customer = custData[0];
 			// ako customer ne postoji prebaciti fajl u error
-			if (custData.length < 4 || customer == null || customer.length() < 1) {
+			if (custData.length < 4 || custData.length > 5 || customer == null || customer.length() < 1) {
 				Logger.writeToLogFile(getDateAndTime() + " Greska prilikom citanja fajla " + p1.getFileName()
 						+ ". Fajl je prebacen u error folder.");
 
@@ -67,7 +67,12 @@ public class InvoiceFile implements Writable {
 				period = "20" + custData[2];
 				documentType = custData[3];
 			}
-
+			if(documentType == null) {
+				prebaciFajl(p1, "errorFolder");
+				Logger.writeToLogFile(getDateAndTime() + " Greska, documentType nije odredjen: " + p1.getFileName()
+						+ ". Fajl je prebacen u error folder.");
+				continue;
+			}
 			documentType = documentType.substring(documentType.indexOf("_") + 1);
 			documentType = documentType.substring(0, documentType.indexOf("."));
 			// podesiti id tipa dokumenta
