@@ -17,6 +17,7 @@ public class Main {
 			System.exit(-1);
 		}
 		String operation = args[0];
+		//String operation = "invoice";
 
 		UtilClass.loadProperties(Paths.get(PROPS_LOCATION));
 		if (UtilClass.getProperties() == null) {
